@@ -1,0 +1,51 @@
+GET http://localhost:5012/students
+
+###
+GET http://localhost:5012/students/2
+
+
+###
+POST http://localhost:5012/students
+Content-Type: application/json
+
+{
+    "name":"Preetpal Singh",
+    "fatherName":"Jasmeet Singh",
+    "motherName":"Sunita Kaur",
+    "email":"akashnew@gmail.com",
+    "address":{
+        "addressLine1":"Address line 1",
+        "city":"Vikaspuri",
+        "state":"Delhi",
+        "pincode":110018
+    },
+    "familyMembers":[{
+        "name":"Jasmeet Singh",
+        "relationship":"Father",
+        "age":45
+    },{
+        "name":"Sunita Kaur",
+        "relationship":"Mother",
+        "age":41
+    },{
+        "name":"Rashmita kaur",
+        "relationship":"Sister",
+        "age":26
+    }],
+    "certifications":[
+        {"title":"Full Stack Development",
+        "institution":"Udemy",
+        "dateAwarded":"2024-07-02T13:52:04.123Z"
+        },
+         {"title":"Devops Engineer Course",
+        "institution":"Udemy",
+        "dateAwarded":"2024-07-02T13:52:04.123Z"
+        }
+    ]
+}
+
+###
+
+DELETE http://localhost:5012/students/2
+
+
