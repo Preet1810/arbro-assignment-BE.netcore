@@ -81,11 +81,13 @@ public static class StudentEndpoints
 
 
         // DELETE /students
-        group.MapDelete("/{id}", (int id) =>
+        group.MapDelete("/{id}", (int id, StudentStoreContext dbContext) =>
         {
-            students.RemoveAll(student => student.Id == id);
+            dbContext.Students.Where(student => student.Id == id).ExecuteDelete();
             return Results.NoContent();
         });
+
+
         return group;
     }
 }
