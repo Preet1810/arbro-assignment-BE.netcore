@@ -1,7 +1,7 @@
 ﻿using StudentStore;
 using StudentStore.Data;
 using StudentStore.Entities;
-
+using Microsoft.EntityFrameworkCore;
 namespace StudentStore.Endpoints;
 
 public static class StudentEndpoints
@@ -13,15 +13,27 @@ public static class StudentEndpoints
     {
 
         var group = app.MapGroup("students");
-        // GET /students
-        group.MapGet("/", () => students);
+        group.MapGet("/", (StudentStoreContext dbContext) =>
+            {
+                var students = dbContext.Students
+                .Include(s => s.Address)
+                .Include(s => s.Certifications)
+                .Include(s => s.FamilyMembers)
+                .ToList();
+
+                return Results.Ok(students);
+            }).WithName("GetStudents");
 
         // GET /students/1
-        group.MapGet("/{id}", (int id) =>
-        {
-            StudentDto? student = students.Find(student => student.Id == id);
-            return student is null ? Results.NotFound() : Results.Ok(student);
-        }).WithName("GetStudent");
+        group.MapGet("/{id}", (int id, StudentStoreContext dbContext) =>
+             {
+                 Student? student = dbContext.Students
+                                    .Include(s => s.Address)
+                                    .Include(s => s.FamilyMembers)
+                                    .Include(s => s.Certifications)
+                                    .FirstOrDefault(s => s.Id == id);
+                 return student is null ? Results.NotFound() : Results.Ok(student);
+             }).WithName("GetStudent");
 
         // POST /students
         group.MapPost("/", (CreateStudentDto newStudent, StudentStoreContext dbContext) =>

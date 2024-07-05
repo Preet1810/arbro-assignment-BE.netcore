@@ -1,7 +1,7 @@
 GET http://localhost:5012/students
 
 ###
-GET http://localhost:5012/students/2
+GET http://localhost:5012/students/1
 
 
 ###

@@ -9,4 +9,6 @@ public class StudentStoreContext(DbContextOptions<StudentStoreContext> options)
     public DbSet<Address> Addresses { get; set; }
     public DbSet<FamilyMember> FamilyMembers { get; set; }
     public DbSet<Certification> Certifications { get; set; }
+
+
 }
