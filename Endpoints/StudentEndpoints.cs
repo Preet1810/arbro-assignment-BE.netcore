@@ -1,4 +1,4 @@
-﻿namespace StudentStore;
+﻿namespace StudentStore.Endpoints;
 
 public static class StudentEndpoints
 {
