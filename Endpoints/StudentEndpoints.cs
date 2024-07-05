@@ -1,4 +1,8 @@
-﻿namespace StudentStore.Endpoints;
+﻿using StudentStore;
+using StudentStore.Data;
+using StudentStore.Entities;
+
+namespace StudentStore.Endpoints;
 
 public static class StudentEndpoints
 {
@@ -20,21 +24,45 @@ public static class StudentEndpoints
         }).WithName("GetStudent");
 
         // POST /students
-        group.MapPost("/", (CreateStudentDto newStudent) =>
+        group.MapPost("/", (CreateStudentDto newStudent, StudentStoreContext dbContext) =>
         {
-            int newId = students.Count + 1;
-            StudentDto student = new StudentDto(
-                Id: newId,
-                Name: newStudent.Name,
-                FatherName: newStudent.FatherName,
-                MotherName: newStudent.MotherName,
-                Email: newStudent.Email,
-                Address: newStudent.Address,
-                FamilyMembers: newStudent.FamilyMembers,
-                Certifications: newStudent.Certifications
-            );
 
-            students.Add(student);
+            // Map AddressDto to Address
+            Address address = new Address
+            {
+                AddressLine1 = newStudent.Address.AddressLine1,
+                City = newStudent.Address.City,
+                State = newStudent.Address.State,
+                Pincode = newStudent.Address.Pincode
+            };
+
+            // Map FamilyMemberDto to FamilyMember
+            List<FamilyMember> familyMembers = newStudent.FamilyMembers.Select(fm => new FamilyMember
+            {
+                Name = fm.Name,
+                Relationship = fm.Relationship,
+            }).ToList();
+
+            // Map CertificationDto to Certification
+            List<Certification> certifications = newStudent.Certifications.Select(c => new Certification
+            {
+                Name = c.Name,
+                Institution = c.Institution,
+            }).ToList();
+
+            Student student = new Student
+            {
+                Name = newStudent.Name,
+                FatherName = newStudent.FatherName,
+                MotherName = newStudent.MotherName,
+                Email = newStudent.Email,
+                Address = address,
+                FamilyMembers = familyMembers,
+                Certifications = certifications
+            };
+
+            dbContext.Students.Add(student);
+            dbContext.SaveChanges();
 
             return Results.CreatedAtRoute("GetStudent", new { id = student.Id }, student);
         });
