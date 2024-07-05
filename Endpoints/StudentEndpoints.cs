@@ -13,14 +13,9 @@ public static class StudentEndpoints
     {
 
         var group = app.MapGroup("students");
-        group.MapGet("/", (StudentStoreContext dbContext) =>
+        group.MapGet("/", async (StudentStoreContext dbContext) =>
             {
-                var students = dbContext.Students
-                .Include(s => s.Address)
-                .Include(s => s.Certifications)
-                .Include(s => s.FamilyMembers)
-                .ToList();
-
+                var students = await dbContext.Students.ToListAsync();
                 return Results.Ok(students);
             }).WithName("GetStudents");
 
@@ -36,7 +31,7 @@ public static class StudentEndpoints
              }).WithName("GetStudent");
 
         // POST /students
-        group.MapPost("/", (CreateStudentDto newStudent, StudentStoreContext dbContext) =>
+        group.MapPost("/", async (CreateStudentDto newStudent, StudentStoreContext dbContext) =>
         {
 
             // Map AddressDto to Address
@@ -73,20 +68,27 @@ public static class StudentEndpoints
                 Certifications = certifications
             };
 
-            dbContext.Students.Add(student);
-            dbContext.SaveChanges();
+            await dbContext.Students.AddAsync(student);
+            await dbContext.SaveChangesAsync();
 
             return Results.CreatedAtRoute("GetStudent", new { id = student.Id }, student);
         });
 
 
         // DELETE /students
-        group.MapDelete("/{id}", (int id, StudentStoreContext dbContext) =>
-        {
-            dbContext.Students.Where(student => student.Id == id).ExecuteDelete();
-            return Results.NoContent();
-        });
+        group.MapDelete("/{id}", async (int id, StudentStoreContext dbContext) =>
+            {
+                var student = await dbContext.Students.SingleOrDefaultAsync(s => s.Id == id);
+                if (student == null)
+                {
+                    return Results.NotFound();
+                }
 
+                dbContext.Students.Remove(student);
+                await dbContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            });
 
         return group;
     }

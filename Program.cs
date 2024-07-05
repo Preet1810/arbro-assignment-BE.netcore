@@ -17,6 +17,6 @@ var app = builder.Build();
 
 app.MapStudentsEndpoints();
 
-app.MigrateDb();
+await app.MigrateDbAsync();
 
 app.Run();
